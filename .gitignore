@@ -1,0 +1,12 @@
+*.iml
+.gradle/
+build/
+local.properties
+.idea/
+captures/
+.cxx/
+keystore.properties
+*.jks
+*.keystore
+*.b64
+secretos.txt

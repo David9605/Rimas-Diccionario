@@ -1,0 +1,34 @@
+name: Generar palabras desde RLA-ES (guardar en el repositorio)
+
+# Opcional: el build ya genera las palabras solo. Úsalo si quieres guardar palabras.txt en el repositorio.
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Versión de RLA-ES'
+        default: '2.9'
+      variante:
+        description: 'es_ANY (general), es_VE (Venezuela), es_ES, es_MX...'
+        default: 'es_ANY'
+
+permissions:
+  contents: write
+
+jobs:
+  generar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: sudo apt-get update && sudo apt-get install -y hunspell-tools unzip
+      - run: bash tools/generar_palabras.sh "${{ inputs.version }}" "${{ inputs.variante }}"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: palabras
+          path: app/src/main/assets/palabras.txt
+      - name: Guardar en el repositorio
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@users.noreply.github.com"
+          git add app/src/main/assets
+          git commit -m "Datos: palabras.txt desde RLA-ES ${{ inputs.version }} (${{ inputs.variante }})" || echo "Sin cambios"
+          git push
